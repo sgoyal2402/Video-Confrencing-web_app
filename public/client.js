@@ -22,34 +22,35 @@ var isCaller
 
 var socket = io()
 
-btnGo.onclick(() => {
+btnGo.onclick = () => {
     if(inputroomNumber.value === '')
     alert("Enter a room number!!!")
     else {
         roomNumber = inputroomNumber.value;
-        socket.emit("Create or Join", roomNumber);
+        socket.emit("create or join", roomNumber);
         divSelectRoom.style= "display : none";
         divConsultRoom.style = "display:block";
 
     }
 
-});
+};
 
 socket.on('created', (room) => {
-    navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
-        localStream = stream
-        localVideo.src = URL.createObjectURL(stream);
+    navigator.mediaDevices.getUserMedia(streamConstraints).then(function(stream) {
+        localStream = stream;
+        console.log("working");
+        localVideo.srcObject = stream;
         isCaller = true;
     })
     .catch((err) => {
-        console.log("An error occured while connecting to media");
+        console.log("An error occured while connecting to media" + err);
     })
 })
 
 socket.on('joined', (room) => {
     navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
         localStream = stream
-        localVideo.src = URL.createObjectURL(stream);
+        localVideo.srcObject = stream;
         socket.emit('ready', roomNumber);
     })
     .catch((err) => {
@@ -109,7 +110,7 @@ socket.on('candidate', (event) => {
 
 function onAddStream(event){
 
-    remoteVideo.src = URL.createObjectURL(event.stream)
+    remoteVideo.srcObject = event.stream
     remoteStream = event.stream
 
 }
