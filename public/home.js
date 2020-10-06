@@ -2,7 +2,17 @@ var create = document.getElementById('create');
 
 var join = document.getElementById('join');
 
-var roomId = document.getElementById('roomId').value;
+var input = document.getElementById('roomId');
+
+var myVideo = document.getElementById('myVideo');
+
+var form = document.querySelector('form');
+
+form.onsubmit = (event) => {
+    event.preventDefault()
+}
+
+var roomId ;
 
 create.onclick = () => {
     roomId = Math.floor(Math.random()*10000 + 1);
@@ -14,3 +24,20 @@ join.onclick = () => {
     window.location.href = `http://localhost:3000/${roomId}` ;
 }
 
+input.onclick = () => {
+    join.classList.remove('d-none');
+}
+
+input.onkeyup = () => {
+    join.disabled = false;
+    join.style.color = 'green';
+}
+
+navigator.mediaDevices.getUserMedia({audio: true, video: true}).then((stream) => {
+    myVideo.srcObject = stream;
+    myVideo.play();
+
+}).catch((err) => {
+    myVideo.innerHTML = "Sorry problem connecting media devices"
+    console.log(err);
+})
