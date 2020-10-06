@@ -10,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "kurento-client": "^6.14.0",
+    "minimist": "^1.2.5",
+    "peer": "^0.5.3",
     "socket.io": "^2.3.0"
   }
 }
