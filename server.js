@@ -10,8 +10,19 @@ var io = require('socket.io')(http)
 // const {PeerServer} = require('peer')
 
 // const peerServer = PeerServer({port: 3001, path: '/serve'})
-
+app.set('view engine', 'ejs')
 app.use(express.static('public'))
+
+app.get('/', (req, res) => {
+
+    res.render('home');
+
+})
+
+app.get('/:roomId', (req, res) => {
+
+    res.render('room', {roomId: req.params.roomId});
+})
 
 io.on('connection' , (socket) => {
 
