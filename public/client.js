@@ -20,6 +20,7 @@ chatBtn.onclick = () => {
 var message = document.getElementById('chat');
 var messages = document.getElementById('messages');
 
+
 message.onkeydown = (e) => {
     if(e.keyCode == 13){
         socket.emit('message', message.value, myPeerId)
@@ -35,6 +36,7 @@ message.onkeydown = (e) => {
 
 var myPeerId;
 
+//create Peer
 const peer = new Peer(undefined, {
   host: "/",
   port: 3001,
@@ -43,7 +45,7 @@ const peer = new Peer(undefined, {
 var peers = {};
 
 var streamConstraints = { audio: true, video: true };
-var isCaller;
+
 
 var socket = io();
 
@@ -53,7 +55,7 @@ peer.on("open", (id) => {
     console.log("joined");
   });
 
-
+//Stream VIdeo and Audio
 navigator.mediaDevices
   .getUserMedia(streamConstraints)
   .then((stream) => {
@@ -77,6 +79,7 @@ navigator.mediaDevices
     console.log("An error occured while connecting to media", err);
   });
 
+//Recieve messages  
 socket.on('messaged', (msg, id) => {
 
 console.log(msg);
@@ -84,7 +87,7 @@ addMsg(msg, id);
 
 })
 
-
+//Close Connection
 socket.on("disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
@@ -94,6 +97,8 @@ endCall.onclick = () => {
     window.location.href = 'http://localhost:3000/end/call';
 
 }
+
+//Some functions
 
 function connectToNewUser(userId, stream) {
   const call = peer.call(userId, stream);

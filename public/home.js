@@ -8,11 +8,14 @@ var myVideo = document.getElementById('myVideo');
 
 var form = document.querySelector('form');
 
+//Stop reloading page on submit
 form.onsubmit = (event) => {
     event.preventDefault()
 }
 
 var roomId ;
+
+
 
 create.onclick = () => {
     roomId = Math.floor(Math.random()*10000 + 1);

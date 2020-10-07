@@ -1,107 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room <%= roomId %></title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://kit.fontawesome.com/ecbc21292c.js"
-      crossorigin="anonymous"
-    ></script>
+<%- include("header") -%> 
 
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+      <!-- Chat BUtton -->
+    <button class="chat btn btn-light position-absolute">
+      Chat <i class="fas fa-comment-alt"></i>
+    </button>
 
-    <button class="chat btn btn-light position-absolute">Chat <i class="fas fa-comment-alt"></i></button>
+    <!-- Main Section -->
 
     <div class="d-flex">
+      <div class="flex-fill">
+          <!-- All videos will stream here -->
+        <div class="videos d-flex flex-wrap" id="consultingRoom"></div>
 
-        <div class=" flex-fill">
-            <div class="videos d-flex flex-wrap" id="consultingRoom"> 
-
+        <div class="controls">
+          <div class="mb-3 mt-3 container-fluid">
+            <button
+              type="button"
+              class="btn btn-light"
+              id="details"
+              data-toggle="modal"
+              data-target="#roomDetails"
+            >
+              Room Details
+            </button>
+            <div
+              class="modal fade"
+              id="roomDetails"
+              tabindex="-1"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Room Details</h5>
+                    <button
+                      type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <p><strong>RoomId: </strong> <%= roomId %></p>
+                    <h6>Room Link:</h6>
+                    <span>http://localhost:3000/<%= roomId %> </span>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div class="controls" >
-                <div class="mb-3 mt-3 container-fluid">
-                    <button type="button" class="btn btn-light" id="details" data-toggle="modal" data-target="#roomDetails">
-                        Room Details
-                      </button>
-                      <div class="modal fade" id="roomDetails" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                          <div class="modal-dialog modal-sm">
-                              <div class="modal-content">
-                                  <div class="modal-header">
-                                      <h5 class="modal-title">Room Details</h5>
-                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                      </button>
-                                  </div>
-                                  <div class="modal-body">
-                                    <p><strong>RoomId: </strong>  <%= roomId %>  </p>
-                                    <h6>Room Link: </h6> <span>http://localhost:3000/<%= roomId %> </span>
-                                    
-                                  </div>
-                              </div>
-                          </div>
-
-                      </div>
-                <button class="end shadow" id = 'end-call'>
-                    <img  class="img-fluid" src="images/end-call.png" alt="End Call">
-                </button>
-            </div>
-            </div>
-
+            <button class="end shadow" id="end-call">
+              <img class="img-fluid" src="images/end-call.png" alt="End Call" />
+            </button>
+          </div>
         </div>
-    
-    
+      </div>
 
-    <div class="message d-none shadow" id = "chats">
+      <!-- Message Section -->
+
+      <div class="message d-none shadow" id="chats">
         <h5 class="text-center mt-2">Live Chat</h5>
 
-        <div id="messages" class="d-flex flex-column justify-content-end">
-
-        </div>
+        <div id="messages" class="d-flex flex-column justify-content-end"></div>
 
         <div class="text-input">
-
-            <input type="text" class="form-control ml-2" id="chat" placeholder="Type your message here">
-
+          <input
+            type="text"
+            class="form-control ml-2"
+            id="chat"
+            placeholder="Type your message here"
+          />
         </div>
+      </div>
     </div>
 
-</div>
-
-    
-
     <script>
-        var roomNumber = "<%= roomId %>";
+      var roomNumber = "<%= roomId %>";
     </script>
-
-    <script
-    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-    crossorigin="anonymous"
-    ></script>
-    <script
-    src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
-    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
-    crossorigin="anonymous"
-    ></script>
-    <script
-    src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
-    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
-    crossorigin="anonymous"
-    ></script>
 
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
-    
-</body>
-</html>
+
+
+    <%- include ("footer") -%>
