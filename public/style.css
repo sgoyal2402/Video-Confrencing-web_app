@@ -1,0 +1,40 @@
+.end{
+    border-radius: 100%;
+    background-color: white;
+    width: 60px;
+    height: 60px;
+    
+    border: none;
+}
+
+/* .videos{
+    display: flex;
+    
+    flex-direction: row;
+   
+    max-width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(34, 33, 33);
+    flex-wrap: wrap;
+    flex-flow: row wrap;
+} */
+
+/* video{
+    max-width: 100%;
+    width: 100px;
+    height: auto;
+    flex-shrink: 90;
+    flex-grow: 100;
+} */
+
+.controls{
+    background-color: white;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+}
+

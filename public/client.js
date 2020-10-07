@@ -3,6 +3,10 @@ var divConsultRoom = document.getElementById("consultingRoom");
 
 var myVideo = document.createElement("video");
 
+var endCall = document.getElementById('end-call')
+
+var myPeerId;
+
 const peer = new Peer(undefined, {
   host: "/",
   port: 3001,
@@ -14,6 +18,13 @@ var streamConstraints = { audio: true, video: true };
 var isCaller;
 
 var socket = io();
+
+peer.on("open", (id) => {
+    socket.emit("join", roomNumber, id);
+    myPeerId = id;
+    console.log("joined");
+  });
+
 
 navigator.mediaDevices
   .getUserMedia(streamConstraints)
@@ -38,14 +49,16 @@ navigator.mediaDevices
     console.log("An error occured while connecting to media", err);
   });
 
-peer.on("open", (id) => {
-  socket.emit("join", roomNumber, id);
-  console.log("joined");
-});
+
 
 socket.on("disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
+
+endCall.onclick = () => {
+    socket.emit('disconnect', myPeerId);
+    window.location.href = 'http://localhost:3000';
+}
 
 function connectToNewUser(userId, stream) {
   const call = peer.call(userId, stream);

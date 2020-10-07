@@ -7,9 +7,9 @@ const http = require('http').Server(app)
 
 var io = require('socket.io')(http)
 
-// const {PeerServer} = require('peer')
+const {PeerServer} = require('peer')
 
-// const peerServer = PeerServer({port: 3001, path: '/serve'})
+const peerServer = PeerServer({port: 3001, path: '/'})
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
@@ -33,7 +33,7 @@ io.on('connection' , (socket) => {
         console.log("User Joined ", roomId)
 
 
-      socket.join(roomId)
+      socket.join(roomId, (err) => {console.log(err);})
       socket.to(roomId).broadcast.emit('connected', userId)
   
       socket.on('disconnect', () => {
