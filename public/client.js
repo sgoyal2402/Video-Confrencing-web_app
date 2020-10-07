@@ -19,7 +19,7 @@ var messages = document.getElementById('messages');
 
 message.onkeydown = (e) => {
     if(e.keyCode == 13){
-        socket.emit('message', message.value)
+        socket.emit('message', message.value, myPeerId)
         console.log(message.value);
         
         addMsg(message.value);
@@ -74,10 +74,10 @@ navigator.mediaDevices
     console.log("An error occured while connecting to media", err);
   });
 
-socket.on('messaged', (msg) => {
+socket.on('messaged', (msg, id) => {
 
 console.log(msg);
-addMsg(msg);
+addMsg(msg, id);
 
 })
 
@@ -115,12 +115,26 @@ function addVideoStream(video, stream) {
 }
 
 
-function addMsg(msg) {
+function addMsg(msg, id) {
 
-    const text = document.createElement('p')
-    text.innerText = msg;
-    messages.appendChild(text);
+    var m = createCard(msg, id);
+
+    messages.appendChild(m);
 
 
 
+}
+
+function createCard(msg, id) {
+    const card = `<div class = "card-body">
+    <small class="card-subtitle mb-2 text-muted">User ${id}</small>
+     <p class = "card-text">${msg}</p>
+      </div> `
+    
+    var c = document.createElement('div');
+    c.innerHTML = card;
+    c.classList.add('card');
+    c.classList.add('mb-1')  
+
+    return c;
 }

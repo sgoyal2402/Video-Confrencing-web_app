@@ -7,47 +7,60 @@
     border: none;
 }
 
-/* .videos{
-    display: flex;
-    
-    flex-direction: row;
-   
-    max-width: 100%;
-    max-height: 100vh;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
+.videos{
     background-color: rgb(34, 33, 33);
-    flex-wrap: wrap;
-    flex-flow: row wrap;
-} */
+}
 
-/* video{
-    max-width: 100%;
-    width: 100px;
-    height: auto;
-    flex-shrink: 90;
-    flex-grow: 100;
-} */
+video{
+    flex-basis: 20%;
+    flex-shrink: 1;
+    flex-grow: 1;
+    min-width: 200px;
+}
 
 .videos{
 
-    height: calc(100vh - 110px);
+    height: calc(100vh - 100px);
 
 }
 
 .controls{
-    background-color: white;
-    position: absolute;
-    bottom: 0;
+    background-color: antiquewhite;
+    
+    border-top: 1px solid black;
     width: 100%;
-    height: 100px;
+    height: 90px;
 }
 
 #messages{
     height: 88%;
+    min-width: 300px;
 }
 
 .text-input{
     height: 10%;
+    margin-bottom: 0;
 }
+
+.chat{
+    z-index: 1;
+    right: 0;
+}
+
+.card{
+    width: 80%;
+    height: auto;
+    margin-left: 10px;
+    border-radius: 5px;
+    border-color: green;
+}
+
+small{
+    margin-bottom: 0;
+}
+
+.card-body{
+    margin: 0;
+    padding: 5px 14px;
+}
+

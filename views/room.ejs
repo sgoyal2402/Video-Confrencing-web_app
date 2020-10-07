@@ -10,34 +10,35 @@
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
       crossorigin="anonymous"
     />
+    <script
+      src="https://kit.fontawesome.com/ecbc21292c.js"
+      crossorigin="anonymous"
+    ></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <button class="chat btn btn-primary float-right">Chat</button>
+    <button class="chat btn btn-light position-absolute">Chat <i class="fas fa-comment-alt"></i></button>
 
     <div class="d-flex">
     
-    <div class="videos d-flex flex-fill" id="consultingRoom"> 
+    <div class="videos d-flex flex-fill flex-wrap" id="consultingRoom"> 
 
     </div>
 
     <div class="message d-none" id = "chats">
+        <h5 class="text-center mt-2">Live Chat</h5>
 
-        <div id="messages">
+        <div id="messages" class="d-flex flex-column justify-content-end">
 
         </div>
 
         <div class="text-input">
 
-            <input type="text" id="chat" placeholder="Type your message here">
+            <input type="text" class="form-control" id="chat" placeholder="Type your message here">
 
         </div>
-
-        
-
-
     </div>
 
 </div>
