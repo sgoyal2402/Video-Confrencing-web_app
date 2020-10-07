@@ -9,6 +9,9 @@ var chatBtn = document.querySelector('.chat')
 
 var chat = document.getElementById('chats')
 
+var details = document.getElementById('details')
+details.click();
+
 chatBtn.onclick = () => {
     chat.classList.toggle('d-none');
 
@@ -22,7 +25,7 @@ message.onkeydown = (e) => {
         socket.emit('message', message.value, myPeerId)
         console.log(message.value);
         
-        addMsg(message.value);
+        addMsg(message.value, myPeerId);
         message.value = null
     }
     
@@ -88,7 +91,8 @@ socket.on("disconnected", (userId) => {
 
 endCall.onclick = () => {
     socket.emit('disconnect', myPeerId);
-    window.location.href = 'http://localhost:3000';
+    window.location.href = 'http://localhost:3000/end/call';
+
 }
 
 function connectToNewUser(userId, stream) {
@@ -126,8 +130,10 @@ function addMsg(msg, id) {
 }
 
 function createCard(msg, id) {
+
+    
     const card = `<div class = "card-body">
-    <small class="card-subtitle mb-2 text-muted">User ${id}</small>
+    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0,8)}</small>
      <p class = "card-text">${msg}</p>
       </div> `
     

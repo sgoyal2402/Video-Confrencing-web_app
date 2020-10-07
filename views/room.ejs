@@ -22,12 +22,46 @@
     <button class="chat btn btn-light position-absolute">Chat <i class="fas fa-comment-alt"></i></button>
 
     <div class="d-flex">
+
+        <div class=" flex-fill">
+            <div class="videos d-flex flex-wrap" id="consultingRoom"> 
+
+            </div>
+
+            <div class="controls" >
+                <div class="mb-3 mt-3 container-fluid">
+                    <button type="button" class="btn btn-light" id="details" data-toggle="modal" data-target="#roomDetails">
+                        Room Details
+                      </button>
+                      <div class="modal fade" id="roomDetails" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-sm">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title">Room Details</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <p><strong>RoomId: </strong>  <%= roomId %>  </p>
+                                    <h6>Room Link: </h6> <span>http://localhost:3000/<%= roomId %> </span>
+                                    
+                                  </div>
+                              </div>
+                          </div>
+
+                      </div>
+                <button class="end shadow" id = 'end-call'>
+                    <img  class="img-fluid" src="images/end-call.png" alt="End Call">
+                </button>
+            </div>
+            </div>
+
+        </div>
     
-    <div class="videos d-flex flex-fill flex-wrap" id="consultingRoom"> 
+    
 
-    </div>
-
-    <div class="message d-none" id = "chats">
+    <div class="message d-none shadow" id = "chats">
         <h5 class="text-center mt-2">Live Chat</h5>
 
         <div id="messages" class="d-flex flex-column justify-content-end">
@@ -36,28 +70,14 @@
 
         <div class="text-input">
 
-            <input type="text" class="form-control" id="chat" placeholder="Type your message here">
+            <input type="text" class="form-control ml-2" id="chat" placeholder="Type your message here">
 
         </div>
     </div>
 
 </div>
 
-    <div class="controls" >
-        <div class="mb-3 mt-3 container-fluid">
-            <button type="button" class="btn btn-light dropdown-toggle mr-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Room Details
-              </button>
-              <div class="dropdown-menu p-4">
-                <p><strong>RoomId</strong>  <%= roomId %>  </p>
-                <p>Room Link</p>
-                <p>http://localhost:3000/<%= roomId %> </p>
-              </div>
-        <button class="end shadow" id = 'end-call'>
-            <img  class="img-fluid" src="images/end-call.png" alt="End Call">
-        </button>
-    </div>
-    </div>
+    
 
     <script>
         var roomNumber = "<%= roomId %>";

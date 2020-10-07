@@ -8,7 +8,6 @@ const http = require('http').Server(app)
 var io = require('socket.io')(http)
 
 const {PeerServer} = require('peer')
-
 const peerServer = PeerServer({port: 3001, path: '/'})
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -22,6 +21,10 @@ app.get('/', (req, res) => {
 app.get('/:roomId', (req, res) => {
 
     res.render('room', {roomId: req.params.roomId});
+})
+
+app.get('/end/call', (req, res) => {
+    res.render('leave');
 })
 
 io.on('connection' , (socket) => {
@@ -55,3 +58,4 @@ io.on('connection' , (socket) => {
 http.listen(3000, () => {
     console.log('Server running on 3000');
 })
+
