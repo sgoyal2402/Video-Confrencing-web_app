@@ -5,6 +5,31 @@ var myVideo = document.createElement("video");
 
 var endCall = document.getElementById('end-call')
 
+var chatBtn = document.querySelector('.chat')
+
+var chat = document.getElementById('chats')
+
+chatBtn.onclick = () => {
+    chat.classList.toggle('d-none');
+
+}
+
+var message = document.getElementById('chat');
+var messages = document.getElementById('messages');
+
+message.onkeydown = (e) => {
+    if(e.keyCode == 13){
+        socket.emit('message', message.value)
+        console.log(message.value);
+        
+        addMsg(message.value);
+        message.value = null
+    }
+    
+}
+
+
+
 var myPeerId;
 
 const peer = new Peer(undefined, {
@@ -49,6 +74,12 @@ navigator.mediaDevices
     console.log("An error occured while connecting to media", err);
   });
 
+socket.on('messaged', (msg) => {
+
+console.log(msg);
+addMsg(msg);
+
+})
 
 
 socket.on("disconnected", (userId) => {
@@ -62,6 +93,7 @@ endCall.onclick = () => {
 
 function connectToNewUser(userId, stream) {
   const call = peer.call(userId, stream);
+
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
@@ -80,4 +112,15 @@ function addVideoStream(video, stream) {
     video.play();
   });
   divConsultRoom.appendChild(video);
+}
+
+
+function addMsg(msg) {
+
+    const text = document.createElement('p')
+    text.innerText = msg;
+    messages.appendChild(text);
+
+
+
 }

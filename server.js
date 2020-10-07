@@ -35,9 +35,14 @@ io.on('connection' , (socket) => {
 
       socket.join(roomId, (err) => {console.log(err);})
       socket.to(roomId).broadcast.emit('connected', userId)
+
+      socket.on('message', (msg) => {
+          socket.to(roomId).broadcast.emit('messaged', msg);
+      })
   
       socket.on('disconnect', () => {
         socket.to(roomId).broadcast.emit('disconnected', userId)
+
       })
     })
 

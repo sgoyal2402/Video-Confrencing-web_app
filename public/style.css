@@ -30,6 +30,12 @@
     flex-grow: 100;
 } */
 
+.videos{
+
+    height: calc(100vh - 110px);
+
+}
+
 .controls{
     background-color: white;
     position: absolute;
@@ -38,3 +44,10 @@
     height: 100px;
 }
 
+#messages{
+    height: 88%;
+}
+
+.text-input{
+    height: 10%;
+}
