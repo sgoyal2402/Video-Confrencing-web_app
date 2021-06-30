@@ -22,7 +22,7 @@ message.onkeydown = (e) => {
     socket.emit("message", message.value, socket.id);
     console.log(message.value);
 
-    addMsg(message.value, myPeerId);
+    addMsg(message.value, socket.id);
     message.value = null;
   }
 };

@@ -54,6 +54,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", (msg, id) => {
+    var roomID = socketToRoom[socket.id];
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
     usersInThisRoom.forEach((user) => {
       socket.to(user).emit("messaged", msg, id);
