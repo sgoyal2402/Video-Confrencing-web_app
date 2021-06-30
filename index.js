@@ -53,7 +53,12 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("message");
+  socket.on("message", (msg, id) => {
+    const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
+    usersInThisRoom.forEach((user) => {
+      socket.to(user).emit("messaged", msg, id);
+    });
+  });
 
   socket.on("disconnect", () => {
     const roomID = socketToRoom[socket.id];
@@ -66,5 +71,5 @@ io.on("connection", (socket) => {
 });
 
 http.listen(process.env.PORT || 3000, () => {
-  console.log(`Server running on ${process.env.PORT}`);
+  console.log(`Server running on ${process.env.PORT || 3000}`);
 });
