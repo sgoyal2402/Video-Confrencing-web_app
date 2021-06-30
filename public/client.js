@@ -30,6 +30,7 @@ var socket = io();
 
 navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
   myVideo.srcObject = stream;
+  myVideo.muted = true;
   myVideo.autoplay = true;
   divConsultRoom.appendChild(myVideo);
   socket.emit("join room", roomNumber);
