@@ -1,151 +1,124 @@
-
 var divConsultRoom = document.getElementById("consultingRoom");
-
 var myVideo = document.createElement("video");
-
-var endCall = document.getElementById('end-call')
-
-var chatBtn = document.querySelector('.chat')
-
-var chat = document.getElementById('chats')
-
-var details = document.getElementById('details')
+var endCall = document.getElementById("end-call");
+var chatBtn = document.querySelector(".chat");
+var chat = document.getElementById("chats");
+var details = document.getElementById("details");
 details.click();
 
 chatBtn.onclick = () => {
-    chat.classList.toggle('d-none');
+  chat.classList.toggle("d-none");
+};
 
-}
-
-var message = document.getElementById('chat');
-var messages = document.getElementById('messages');
-
+var message = document.getElementById("chat");
+var messages = document.getElementById("messages");
 
 message.onkeydown = (e) => {
-    if(e.keyCode == 13){
-        socket.emit('message', message.value, myPeerId)
-        console.log(message.value);
-        
-        addMsg(message.value, myPeerId);
-        message.value = null
-    }
-    
-}
+  if (e.keyCode == 13) {
+    socket.emit("message", message.value, myPeerId);
+    console.log(message.value);
 
+    addMsg(message.value, myPeerId);
+    message.value = null;
+  }
+};
 
-
-var myPeerId;
-
-//create Peer
-const peer = new Peer(undefined, {
-  host: "/",
-  port: 3001,
-});
-
-var peers = {};
-
+var peers = [];
+var peersObj = [];
 var streamConstraints = { audio: true, video: true };
-
-
 var socket = io();
 
-peer.on("open", (id) => {
-    socket.emit("join", roomNumber, id);
-    myPeerId = id;
-    console.log("joined");
-  });
-
-//Stream VIdeo and Audio
-navigator.mediaDevices
-  .getUserMedia(streamConstraints)
-  .then((stream) => {
-    addVideoStream(myVideo, stream);
-
-    peer.on("call", (call) => {
-      call.answer(stream);
-      const video = document.createElement("video");
-      call.on("stream", (userVideoStream) => {
-        addVideoStream(video, userVideoStream);
+navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
+  myVideo.srcObject = stream;
+  myVideo.autoplay = true;
+  divConsultRoom.appendChild(myVideo);
+  socket.emit("join room", roomNumber);
+  socket.on("all users", (users) => {
+    users.forEach((userID) => {
+      const peer = createPeer(userID, socket.id, stream);
+      peersObj.push({
+        peerID: userID,
+        peer,
       });
+      peers.push(peer);
     });
-
-    socket.on("connected", (userId) => {
-      console.log(userId, "connected");
-
-      connectToNewUser(userId, stream);
-    });
-  })
-  .catch((err) => {
-    console.log("An error occured while connecting to media", err);
   });
 
-//Recieve messages  
-socket.on('messaged', (msg, id) => {
+  socket.on("user joined", (payload) => {
+    const peer = addPeer(payload.signal, payload.callerID, stream);
+    peersObj.push({
+      peerID: payload.callerID,
+      peer,
+    });
+    peers.push(peer);
+  });
 
-console.log(msg);
-addMsg(msg, id);
-
-})
-
-//Close Connection
-socket.on("disconnected", (userId) => {
-  if (peers[userId]) peers[userId].close();
+  socket.on("receiving returned signal", (payload) => {
+    const item = peersObj.find((p) => p.peerID === payload.id);
+    item.peer.signal(payload.signal);
+  });
 });
 
-endCall.onclick = () => {
-    socket.emit('disconnect', myPeerId);
-    window.location.href = 'http://localhost:3000/end/call';
-
-}
-
-//Some functions
-
-function connectToNewUser(userId, stream) {
-  const call = peer.call(userId, stream);
-
-  const video = document.createElement("video");
-  call.on("stream", (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
-  });
-  call.on("close", () => {
-    video.remove();
+function createPeer(userToSignal, callerID, stream) {
+  const peer = new SimplePeer({
+    initiator: true,
+    trickle: false,
+    stream,
   });
 
-  peers[userId] = call;
+  peer.on("signal", (signal) => {
+    socket.emit("sending signal", {
+      userToSignal,
+      callerID,
+      signal,
+    });
+  });
+
+  peer.on("stream", (stream) => {
+    addVideo(callerID, stream);
+  });
+
+  peer.on("close", () => {
+    removeVideo(callerID);
+  });
+
+  return peer;
 }
 
-function addVideoStream(video, stream) {
-    console.log('added a stream');
+function addPeer(incomingSignal, callerID, stream) {
+  const peer = new SimplePeer({
+    initiator: false,
+    trickle: false,
+    stream,
+  });
+
+  peer.on("signal", (signal) => {
+    socket.emit("returning signal", { signal, callerID });
+  });
+
+  peer.signal(incomingSignal);
+
+  peer.on("stream", (stream) => {
+    addVideo(callerID, stream);
+  });
+
+  peer.on("close", () => {
+    removeVideo(callerID);
+  });
+
+  return peer;
+}
+
+function addVideo(callerID, stream) {
+  console.log(callerID);
+  var video = document.createElement("video");
+  video.id = callerID;
+  video.autoplay = true;
   video.srcObject = stream;
-  video.addEventListener("loadedmetadata", () => {
-    video.play();
-  });
   divConsultRoom.appendChild(video);
 }
 
-
-function addMsg(msg, id) {
-
-    var m = createCard(msg, id);
-
-    messages.appendChild(m);
-
-
-
-}
-
-function createCard(msg, id) {
-
-    
-    const card = `<div class = "card-body">
-    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0,8)}</small>
-     <p class = "card-text">${msg}</p>
-      </div> `
-    
-    var c = document.createElement('div');
-    c.innerHTML = card;
-    c.classList.add('card');
-    c.classList.add('mb-1')  
-
-    return c;
+function removeVideo(callerID) {
+  var video = document.getElementById(callerID);
+  divConsultRoom.removeChild(video);
 }

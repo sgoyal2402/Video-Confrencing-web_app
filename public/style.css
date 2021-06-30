@@ -1,74 +1,70 @@
-
 /* Video Section */
-.videos{
-    background-color: rgb(34, 33, 33);
+.videos {
+  background-color: rgb(34, 33, 33);
 }
 
-video{
-    flex-basis: 20%;
-    flex-shrink: 1;
-    flex-grow: 1;
-    min-width: 200px;
+video {
+  flex-shrink: 1;
+
+  min-width: 200px;
 }
 
-.videos{
-
-    height: calc(100vh - 100px);
-
+.videos {
+  height: calc(100vh - 100px);
 }
 
-.controls{
-    background-color: white;
-    
-    border-top: 1px solid black;
-    width: 100%;
-    height: 95px;
+.controls {
+  background-color: white;
+
+  border-top: 1px solid black;
+  width: 100%;
+  height: 95px;
 }
 
 /* Message section */
 
-#messages{
-    height: 85%;
-    min-width: 300px;
+#messages {
+  height: 85%;
+  min-width: 300px;
 }
 
-.text-input{
-    height: 10%;
-    margin-bottom: 0;
+.text-input {
+  height: 10%;
+  margin-bottom: 0;
 }
 
-.chat{
-    z-index: 1;
-    right: 0;
+.chat {
+  z-index: 1;
+  right: 0;
 }
 
 .form-control {
-    width: 90%;
+  width: 90%;
 }
 
-.card{
-    width: 80%;
-    height: auto;
-    margin-left: 10px;
-    border-radius: 5px;
-    border-color: green;
+.card {
+  width: 80%;
+  height: auto;
+  margin-left: 10px;
+  border-radius: 5px;
+  border-color: green;
 }
 
-small{
-    margin-bottom: 0;
+small {
+  margin-bottom: 0;
 }
 
-.card-body{
-    margin: 0;
-    padding: 5px 14px;
+.card-body {
+  margin: 0;
+  padding: 5px 14px;
 }
 
 /* end call button */
-.end{
-    border-radius: 100%;
-    background-color: white;
-    width: 60px;
-    height: 60px;
-    margin-left: 40%;
-    border: none;
+.end {
+  border-radius: 100%;
+  background-color: white;
+  width: 60px;
+  height: 60px;
+  margin-left: 40%;
+  border: none;
 }

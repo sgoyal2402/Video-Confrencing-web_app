@@ -1,66 +1,68 @@
+const express = require("express");
+const app = express();
+const http = require("http").Server(app);
+var io = require("socket.io")(http);
 
-const express = require('express');
+app.set("view engine", "ejs");
+app.use(express.static("public"));
 
-const app = express()
+app.get("/", (req, res) => {
+  res.render("home");
+});
 
-const http = require('http').Server(app)
+app.get("/:roomId", (req, res) => {
+  res.render("room", { roomId: req.params.roomId });
+});
 
-var io = require('socket.io')(http)
+app.get("/end/call", (req, res) => {
+  res.render("leave");
+});
 
-//Peer server
+const users = {};
+const socketToRoom = {};
 
-const {PeerServer} = require('peer')
-const peerServer = PeerServer({port: 3001, path: '/'})
+io.on("connection", (socket) => {
+  socket.on("join room", (roomID) => {
+    if (users[roomID]) {
+      const length = users[roomID].length;
+      if (length === 4) {
+        socket.emit("room full");
+        return;
+      }
+      users[roomID].push(socket.id);
+    } else {
+      users[roomID] = [socket.id];
+    }
+    socketToRoom[socket.id] = roomID;
+    const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
 
-app.set('view engine', 'ejs')
-app.use(express.static('public'))
+    socket.emit("all users", usersInThisRoom);
+  });
 
-app.get('/', (req, res) => {
+  socket.on("sending signal", (payload) => {
+    io.to(payload.userToSignal).emit("user joined", {
+      signal: payload.signal,
+      callerID: payload.callerID,
+    });
+  });
 
-    res.render('home');
+  socket.on("returning signal", (payload) => {
+    io.to(payload.callerID).emit("receiving returned signal", {
+      signal: payload.signal,
+      id: socket.id,
+    });
+  });
 
-})
-
-app.get('/:roomId', (req, res) => {
-
-    res.render('room', {roomId: req.params.roomId});
-})
-
-app.get('/end/call', (req, res) => {
-    res.render('leave');
-})
-
-io.on('connection' , (socket) => {
-
-    console.log('a user connected');
-
-    socket.on('join', (roomId, userId) => {
-
-        console.log("User Joined ", roomId)
-
-
-      socket.join(roomId, (err) => {if(err) console.log(err);})
-
-      //Brodcast to all when needed
-      socket.to(roomId).broadcast.emit('connected', userId)
-
-      socket.on('message', (msg, id) => {
-          socket.to(roomId).broadcast.emit('messaged', msg, id);
-      })
-  
-      socket.on('disconnect', () => {
-        socket.to(roomId).broadcast.emit('disconnected', userId)
-
-      })
-    })
-
-
-    
-
-})
-
+  socket.on("disconnect", () => {
+    const roomID = socketToRoom[socket.id];
+    let room = users[roomID];
+    if (room) {
+      room = room.filter((id) => id !== socket.id);
+      users[roomID] = room;
+    }
+  });
+});
 
 http.listen(3000, () => {
-    console.log('Server running on 3000');
-})
-
+  console.log("Server running on 3000");
+});

@@ -1,46 +1,46 @@
-var create = document.getElementById('create');
+var create = document.getElementById("create");
 
-var join = document.getElementById('join');
+var join = document.getElementById("join");
 
-var input = document.getElementById('roomId');
+var input = document.getElementById("roomId");
 
-var myVideo = document.getElementById('myVideo');
+var myVideo = document.getElementById("myVideo");
 
-var form = document.querySelector('form');
+var form = document.querySelector("form");
 
 //Stop reloading page on submit
 form.onsubmit = (event) => {
-    event.preventDefault()
-}
+  event.preventDefault();
+};
 
-var roomId ;
-
-
+var roomId;
 
 create.onclick = () => {
-    roomId = Math.floor(Math.random()*10000 + 1);
-    window.location.href = `http://localhost:3000/${roomId}`;
-}
+  roomId = Math.floor(Math.random() * 10000 + 1);
+  window.location.href = `http://localhost:3000/${roomId}`;
+};
 
 join.onclick = () => {
-    roomId = document.getElementById('roomId').value;
-    window.location.href = `http://localhost:3000/${roomId}` ;
-}
+  roomId = document.getElementById("roomId").value;
+  window.location.href = `http://localhost:3000/${roomId}`;
+};
 
 input.onclick = () => {
-    join.classList.remove('d-none');
-}
+  join.classList.remove("d-none");
+};
 
 input.onkeyup = () => {
-    join.disabled = false;
-    join.style.color = 'green';
-}
+  join.disabled = false;
+  join.style.color = "green";
+};
 
-navigator.mediaDevices.getUserMedia({audio: true, video: true}).then((stream) => {
+navigator.mediaDevices
+  .getUserMedia({ audio: true, video: true })
+  .then((stream) => {
     myVideo.srcObject = stream;
     myVideo.play();
-
-}).catch((err) => {
-    myVideo.innerHTML = "Sorry problem connecting media devices"
+  })
+  .catch((err) => {
+    myVideo.innerHTML = "Sorry problem connecting media devices";
     console.log(err);
-})
+  });
