@@ -10,12 +10,16 @@ chatBtn.onclick = () => {
   chat.classList.toggle("d-none");
 };
 
+endCall.onclick = () => {
+  window.location.href = "/end/call";
+};
+
 var message = document.getElementById("chat");
 var messages = document.getElementById("messages");
 
 message.onkeydown = (e) => {
   if (e.keyCode == 13) {
-    socket.emit("message", message.value, myPeerId);
+    socket.emit("message", message.value, socket.id);
     console.log(message.value);
 
     addMsg(message.value, myPeerId);
@@ -29,10 +33,16 @@ var streamConstraints = { audio: true, video: true };
 var socket = io();
 
 navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
+  //Adding own stream-video
   myVideo.srcObject = stream;
   myVideo.muted = true;
   myVideo.autoplay = true;
-  divConsultRoom.appendChild(myVideo);
+  var div = document.createElement("div");
+  div.className = "video-participant";
+  div.appendChild(myVideo);
+  divConsultRoom.appendChild(div);
+
+  //Various signaling and adding remote peers
   socket.emit("join room", roomNumber);
   socket.on("all users", (users) => {
     users.forEach((userID) => {
@@ -60,6 +70,13 @@ navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
   });
 });
 
+//Recieve messages
+socket.on("messaged", (msg, id) => {
+  console.log(msg);
+  addMsg(msg, id);
+});
+
+//Some Useful functions
 function createPeer(userToSignal, callerID, stream) {
   const peer = new SimplePeer({
     initiator: true,
@@ -116,10 +133,35 @@ function addVideo(callerID, stream) {
   video.id = callerID;
   video.autoplay = true;
   video.srcObject = stream;
-  divConsultRoom.appendChild(video);
+
+  var div = document.createElement("div");
+  div.className = "video-participant";
+
+  div.appendChild(video);
+  divConsultRoom.appendChild(div);
 }
 
 function removeVideo(callerID) {
   var video = document.getElementById(callerID);
   divConsultRoom.removeChild(video);
+}
+
+function addMsg(msg, id) {
+  var m = createCard(msg, id);
+
+  messages.appendChild(m);
+}
+
+function createCard(msg, id) {
+  const card = `<div class = "card-body">
+    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0, 8)}</small>
+     <p class = "card-text">${msg}</p>
+      </div> `;
+
+  var c = document.createElement("div");
+  c.innerHTML = card;
+  c.classList.add("card");
+  c.classList.add("mb-1");
+
+  return c;
 }

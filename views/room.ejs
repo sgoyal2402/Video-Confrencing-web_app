@@ -1,91 +1,99 @@
-<%- include("header") -%> 
+<%- include("header") -%>
 
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-      <!-- Chat BUtton -->
-    <button class="chat btn btn-light position-absolute">
-      Chat <i class="fas fa-comment-alt"></i>
-    </button>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Chat BUtton -->
+  <button class="chat btn btn-light position-absolute">
+    Chat <i class="fas fa-comment-alt"></i>
+  </button>
 
-    <!-- Main Section -->
+  <!-- Main Section -->
 
-    <div class="d-flex">
-      <div class="flex-fill">
-          <!-- All videos will stream here -->
-        <div class="videos d-flex flex-wrap" id="consultingRoom"></div>
+  <div class="app d-flex">
+    <div class="d-flex flex-column align-items-center app-videos">
+      <!-- All videos will stream here -->
+      <div class="d-flex flex-wrap videos" id="consultingRoom">
 
-        <div class="controls">
-          <div class="mb-3 mt-3 container-fluid">
-            <button
-              type="button"
-              class="btn btn-light"
-              id="details"
-              data-toggle="modal"
-              data-target="#roomDetails"
-            >
-              Room Details
-            </button>
-            <div
-              class="modal fade"
-              id="roomDetails"
-              tabindex="-1"
-              aria-labelledby="exampleModalLabel"
-              aria-hidden="true"
-            >
-              <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">Room Details</h5>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-label="Close"
-                    >
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <p><strong>RoomId: </strong> <%= roomId %></p>
-                    <h6>Room Link:</h6>
-                    <span>http://localhost:3000/<%= roomId %> </span>
-                  </div>
+      </div>
+
+      <div class="controls">
+        <div class="mb-3 mt-3 container-fluid">
+          <button
+            type="button"
+            class="btn btn-light"
+            id="details"
+            data-toggle="modal"
+            data-target="#roomDetails"
+          >
+            Room Details
+          </button>
+          <div
+            class="modal fade"
+            id="roomDetails"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-sm">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Room Details</h5>
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p><strong>RoomId: </strong> <%= roomId %></p>
+                  <h6>Room Link:</h6>
+                  <span>http://localhost:3000/<%= roomId %> </span>
                 </div>
               </div>
             </div>
-            <button class="end shadow" id="end-call">
-              <img class="img-fluid" src="images/end-call.png" alt="End Call" />
-            </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Message Section -->
-
-      <div class="message d-none shadow" id="chats">
-        <h5 class="text-center mt-2">Live Chat</h5>
-
-        <div id="messages" class="d-flex flex-column justify-content-end"></div>
-
-        <div class="text-input">
-          <input
-            type="text"
-            class="form-control ml-2"
-            id="chat"
-            placeholder="Type your message here"
-          />
+          <button class="end shadow" id="end-call">
+            <img class="img-fluid" src="images/end-call.png" alt="End Call" />
+          </button>
         </div>
       </div>
     </div>
 
-    <script>
-      var roomNumber = "<%= roomId %>";
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
-    <script src="simplepeer.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js"></script>
+    <!-- Message Section -->
 
+    <div class="message d-none shadow" id="chats">
+      <h5 class="text-center mt-2">Live Chat</h5>
 
-    <%- include ("footer") -%>
+      <div id="messages" class="d-flex flex-column justify-content-end"></div>
+
+      <div class="text-input">
+        <input
+          type="text"
+          class="form-control ml-2"
+          id="chat"
+          placeholder="Type your message here"
+        />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var roomNumber = "<%= roomId %>";
+  </script>
+
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
+  <script src="simplepeer.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+
+  <%- include ("footer") -%>
+</body>

@@ -53,6 +53,8 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("message");
+
   socket.on("disconnect", () => {
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];
