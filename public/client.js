@@ -3,8 +3,27 @@ var myVideo = document.createElement("video");
 var endCall = document.getElementById("end-call");
 var chatBtn = document.querySelector(".chat");
 var chat = document.getElementById("chats");
-var details = document.getElementById("details");
-details.click();
+var userStream;
+
+$("#mic").on("click", function () {
+  var $thisbutton = $(this);
+  if ($thisbutton.find("span").text() === "mic") {
+    $thisbutton.find("span").text("mic_off");
+  } else $thisbutton.find("span").text("mic");
+
+  $thisbutton.toggleClass("act-red");
+  toggleTrack(userStream, "audio");
+});
+
+$("#videocam").on("click", function () {
+  var $thisbutton = $(this);
+  if ($thisbutton.find("span").text() === "videocam") {
+    $thisbutton.find("span").text("videocam_off");
+  } else $thisbutton.find("span").text("videocam");
+
+  $thisbutton.toggleClass("act-red");
+  toggleTrack(userStream, "video");
+});
 
 chatBtn.onclick = () => {
   chat.classList.toggle("d-none");
@@ -34,6 +53,7 @@ var socket = io();
 
 navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
   //Adding own stream-video
+  userStream = stream;
   myVideo.srcObject = stream;
   myVideo.muted = true;
   myVideo.autoplay = true;
@@ -164,4 +184,30 @@ function createCard(msg, id) {
   c.classList.add("mb-1");
 
   return c;
+}
+
+function toggleTrack(stream, type) {
+  stream.getTracks().forEach((track) => {
+    if (track.kind === type) {
+      track.enabled = !track.enabled;
+    }
+  });
+  myVideo.srcObject = stream;
+  if (type === "video") {
+    peers.forEach((peer) => {
+      peer.replaceTrack(
+        peer.streams[0].getVideoTracks()[0],
+        stream.getVideoTracks()[0],
+        peer.streams[0]
+      );
+    });
+  } else {
+    peers.forEach((peer) => {
+      peer.replaceTrack(
+        peer.streams[0].getAudioTracks()[0],
+        stream.getAudioTracks()[0],
+        peer.streams[0]
+      );
+    });
+  }
 }

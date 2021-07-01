@@ -18,48 +18,15 @@
       </div>
 
       <div class="controls">
-        <div class="mb-3 mt-3 container-fluid">
-          <button
-            type="button"
-            class="btn btn-light"
-            id="details"
-            data-toggle="modal"
-            data-target="#roomDetails"
-          >
-            Room Details
-          </button>
-          <div
-            class="modal fade"
-            id="roomDetails"
-            tabindex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-sm">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Room Details</h5>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <p><strong>RoomId: </strong> <%= roomId %></p>
-                  <h6>Room Link:</h6>
-                  <span>http://localhost:3000/<%= roomId %> </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button class="end shadow" id="end-call">
-            <img class="img-fluid" src="images/end-call.png" alt="End Call" />
-          </button>
-        </div>
+        <button id="mic" class="action-button">
+          <span class="material-icons md-48 md-light">mic</span>
+        </button>
+        <button id="videocam" class="action-button">
+          <span class="material-icons md-48 md-light">videocam</span>
+        </button>
+        <button id="end-call" class="action-button act-red">
+          <span class="material-icons md-48 md-light">call_end</span>
+        </button>
       </div>
     </div>
 
