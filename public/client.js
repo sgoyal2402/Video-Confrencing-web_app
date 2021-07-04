@@ -39,7 +39,6 @@ var messages = document.getElementById("messages");
 message.onkeydown = (e) => {
   if (e.keyCode == 13) {
     socket.emit("message", message.value, socket.id);
-    console.log(message.value);
 
     addMsg(message.value, socket.id);
     message.value = null;
@@ -90,9 +89,18 @@ navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
   });
 });
 
+socket.on("user left", (id) => {
+  var $vid = $("#" + id)
+    .parent()
+    .remove();
+  let _peer = peersObj.find((p) => p.peerID === id);
+  let _peers = peersObj;
+  peersObj = _peers.filter((p) => p.peerID !== id);
+  peers = peers.filter((p) => p !== _peer.peer);
+});
+
 //Recieve messages
 socket.on("messaged", (msg, id) => {
-  console.log(msg);
   addMsg(msg, id);
 });
 
@@ -113,11 +121,7 @@ function createPeer(userToSignal, callerID, stream) {
   });
 
   peer.on("stream", (stream) => {
-    addVideo(callerID, stream);
-  });
-
-  peer.on("close", () => {
-    removeVideo(callerID);
+    addVideo(userToSignal, stream);
   });
 
   return peer;
@@ -140,15 +144,10 @@ function addPeer(incomingSignal, callerID, stream) {
     addVideo(callerID, stream);
   });
 
-  peer.on("close", () => {
-    removeVideo(callerID);
-  });
-
   return peer;
 }
 
 function addVideo(callerID, stream) {
-  console.log(callerID);
   var video = document.createElement("video");
   video.id = callerID;
   video.autoplay = true;
@@ -159,11 +158,6 @@ function addVideo(callerID, stream) {
 
   div.appendChild(video);
   divConsultRoom.appendChild(div);
-}
-
-function removeVideo(callerID) {
-  var video = document.getElementById(callerID);
-  divConsultRoom.removeChild(video);
 }
 
 function addMsg(msg, id) {

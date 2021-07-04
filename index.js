@@ -67,6 +67,10 @@ io.on("connection", (socket) => {
     if (room) {
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
+      //Tell other users to remove the peer which left
+      room.forEach((user) => {
+        socket.to(user).emit("user left", socket.id);
+      });
     }
   });
 });
