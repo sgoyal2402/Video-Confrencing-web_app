@@ -4,6 +4,9 @@ var endCall = document.getElementById("end-call");
 var chatBtn = document.querySelector(".chat");
 var chat = document.getElementById("chats");
 var userStream;
+var userName = "default";
+
+$("#join").on("click", startVideoChat);
 
 $("#mic").on("click", function () {
   var $thisbutton = $(this);
@@ -49,45 +52,79 @@ var peers = [];
 var peersObj = [];
 var streamConstraints = { audio: true, video: true };
 var socket = io();
+var userToName = {};
 
-navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
-  //Adding own stream-video
-  userStream = stream;
-  myVideo.srcObject = stream;
-  myVideo.muted = true;
-  myVideo.autoplay = true;
-  var div = document.createElement("div");
-  div.className = "video-participant";
-  div.appendChild(myVideo);
-  divConsultRoom.appendChild(div);
+//Normal chat group
+socket.emit("join team", roomNumber, userName);
 
-  //Various signaling and adding remote peers
-  socket.emit("join room", roomNumber);
-  socket.on("all users", (users) => {
-    users.forEach((userID) => {
-      const peer = createPeer(userID, socket.id, stream);
+//Recieve messages
+socket.on("messaged", (msg, id) => {
+  addMsg(msg, id);
+});
+
+function addMsg(msg, id) {
+  var m = createCard(msg, id);
+
+  messages.appendChild(m);
+}
+
+function createCard(msg, id) {
+  const card = `<div class = "card-body">
+    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0, 8)}</small>
+     <p class = "card-text">${msg}</p>
+      </div> `;
+
+  var c = document.createElement("div");
+  c.innerHTML = card;
+  c.classList.add("card");
+  c.classList.add("mb-1");
+
+  return c;
+}
+
+//Realted to Video Meet
+function startVideoChat() {
+  navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
+    //Adding own stream-video
+    userStream = stream;
+    myVideo.srcObject = stream;
+    myVideo.muted = true;
+    myVideo.autoplay = true;
+    var div = document.createElement("div");
+    div.className = "video-participant";
+    div.appendChild(myVideo);
+    divConsultRoom.appendChild(div);
+
+    //Various signaling and adding remote peers
+    socket.emit("join room", roomNumber + "-video", userName);
+    socket.on("all users", (users, names) => {
+      userToName = names;
+      users.forEach((userID) => {
+        const peer = createPeer(userID, socket.id, stream);
+        peersObj.push({
+          peerID: userID,
+          peer,
+        });
+        peers.push(peer);
+      });
+    });
+
+    socket.on("user joined", (payload) => {
+      userToName[payload.callerID] = payload.userName;
+      const peer = addPeer(payload.signal, payload.callerID, stream);
       peersObj.push({
-        peerID: userID,
+        peerID: payload.callerID,
         peer,
       });
       peers.push(peer);
     });
-  });
 
-  socket.on("user joined", (payload) => {
-    const peer = addPeer(payload.signal, payload.callerID, stream);
-    peersObj.push({
-      peerID: payload.callerID,
-      peer,
+    socket.on("receiving returned signal", (payload) => {
+      const item = peersObj.find((p) => p.peerID === payload.id);
+      item.peer.signal(payload.signal);
     });
-    peers.push(peer);
   });
-
-  socket.on("receiving returned signal", (payload) => {
-    const item = peersObj.find((p) => p.peerID === payload.id);
-    item.peer.signal(payload.signal);
-  });
-});
+}
 
 socket.on("user left", (id) => {
   var $vid = $("#" + id)
@@ -97,11 +134,6 @@ socket.on("user left", (id) => {
   let _peers = peersObj;
   peersObj = _peers.filter((p) => p.peerID !== id);
   peers = peers.filter((p) => p !== _peer.peer);
-});
-
-//Recieve messages
-socket.on("messaged", (msg, id) => {
-  addMsg(msg, id);
 });
 
 //Some Useful functions
@@ -117,6 +149,7 @@ function createPeer(userToSignal, callerID, stream) {
       userToSignal,
       callerID,
       signal,
+      userName,
     });
   });
 
@@ -158,26 +191,6 @@ function addVideo(callerID, stream) {
 
   div.appendChild(video);
   divConsultRoom.appendChild(div);
-}
-
-function addMsg(msg, id) {
-  var m = createCard(msg, id);
-
-  messages.appendChild(m);
-}
-
-function createCard(msg, id) {
-  const card = `<div class = "card-body">
-    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0, 8)}</small>
-     <p class = "card-text">${msg}</p>
-      </div> `;
-
-  var c = document.createElement("div");
-  c.innerHTML = card;
-  c.classList.add("card");
-  c.classList.add("mb-1");
-
-  return c;
 }
 
 function toggleTrack(stream, type) {
