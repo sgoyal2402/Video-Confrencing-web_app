@@ -1,12 +1,17 @@
 var divConsultRoom = document.getElementById("consultingRoom");
 var myVideo = document.createElement("video");
 var endCall = document.getElementById("end-call");
-var chatBtn = document.querySelector(".chat");
+var messages = document.querySelector(".chat-area");
 var chat = document.getElementById("chats");
-var userStream;
 var userName = "default";
-
-$("#join").on("click", startVideoChat);
+var stream;
+$(".chat-header-button").on("click", function () {
+  console.log("meet join event");
+  startVideoChat();
+  $(".app-videos").removeClass("d-none");
+  $(".chat-sec").addClass("chat-sec-in");
+  $(this).addClass("d-none");
+});
 
 $("#mic").on("click", function () {
   var $thisbutton = $(this);
@@ -28,25 +33,31 @@ $("#videocam").on("click", function () {
   toggleTrack(userStream, "video");
 });
 
-chatBtn.onclick = () => {
-  chat.classList.toggle("d-none");
-};
-
 endCall.onclick = () => {
-  window.location.href = "/end/call";
+  $(".chat-header-button").removeClass("d-none");
+  socket.emit("leave meet", socket.id);
+  $(".chat-sec").removeClass("chat-sec-in");
+  myVideo.srcObject.getTracks().forEach((track) => track.stop());
+  myVideo.srcObject = null;
+  $("#consultingRoom").empty();
+  $(".app-videos").addClass("d-none");
 };
 
-var message = document.getElementById("chat");
-var messages = document.getElementById("messages");
+// $(".chat-input").keyup(function (e) {
+//   if (e.which == 13) {
+//     emitMessage();
+//   }
+// });
+$(".send-button").click(emitMessage);
 
-message.onkeydown = (e) => {
-  if (e.keyCode == 13) {
-    socket.emit("message", message.value, socket.id);
+function emitMessage() {
+  var $input = $(".chat-input");
+  var msg = $input.val();
+  socket.emit("message", msg, socket.id);
 
-    addMsg(message.value, socket.id);
-    message.value = null;
-  }
-};
+  addMsg(msg, socket.id);
+  $input.val(null);
+}
 
 var peers = [];
 var peersObj = [];
@@ -64,67 +75,70 @@ socket.on("messaged", (msg, id) => {
 
 function addMsg(msg, id) {
   var m = createCard(msg, id);
-
   messages.appendChild(m);
 }
 
 function createCard(msg, id) {
-  const card = `<div class = "card-body">
-    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0, 8)}</small>
-     <p class = "card-text">${msg}</p>
+  const card = `<div class = "message-content">
+     <p class = "name"> ${id} </p>
+     <p class = "message">${msg}</p>
       </div> `;
 
   var c = document.createElement("div");
   c.innerHTML = card;
-  c.classList.add("card");
-  c.classList.add("mb-1");
-
+  c.classList.add("message-wrapper");
+  if (id === socket.id) c.classList.add("reverse");
   return c;
 }
 
 //Realted to Video Meet
 function startVideoChat() {
-  navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
+  peers = [];
+  peersObj = [];
+  navigator.mediaDevices.getUserMedia(streamConstraints).then((s) => {
     //Adding own stream-video
-    userStream = stream;
+    stream = s;
     myVideo.srcObject = stream;
     myVideo.muted = true;
     myVideo.autoplay = true;
+    myVideo.id = socket.id;
     var div = document.createElement("div");
     div.className = "video-participant";
     div.appendChild(myVideo);
     divConsultRoom.appendChild(div);
-
+    console.log("navigator");
     //Various signaling and adding remote peers
     socket.emit("join room", roomNumber + "-video", userName);
-    socket.on("all users", (users, names) => {
-      userToName = names;
-      users.forEach((userID) => {
-        const peer = createPeer(userID, socket.id, stream);
-        peersObj.push({
-          peerID: userID,
-          peer,
-        });
-        peers.push(peer);
-      });
-    });
-
-    socket.on("user joined", (payload) => {
-      userToName[payload.callerID] = payload.userName;
-      const peer = addPeer(payload.signal, payload.callerID, stream);
-      peersObj.push({
-        peerID: payload.callerID,
-        peer,
-      });
-      peers.push(peer);
-    });
-
-    socket.on("receiving returned signal", (payload) => {
-      const item = peersObj.find((p) => p.peerID === payload.id);
-      item.peer.signal(payload.signal);
-    });
   });
 }
+
+socket.on("all users", (users, names) => {
+  userToName = names;
+  console.log(users);
+  users.forEach((userID) => {
+    const peer = createPeer(userID, socket.id, stream);
+    peersObj.push({
+      peerID: userID,
+      peer,
+    });
+    peers.push(peer);
+  });
+});
+
+socket.on("user joined", (payload) => {
+  userToName[payload.callerID] = payload.userName;
+  const peer = addPeer(payload.signal, payload.callerID, stream);
+  peersObj.push({
+    peerID: payload.callerID,
+    peer,
+  });
+  peers.push(peer);
+});
+
+socket.on("receiving returned signal", (payload) => {
+  const item = peersObj.find((p) => p.peerID === payload.id);
+  item.peer.signal(payload.signal);
+});
 
 socket.on("user left", (id) => {
   var $vid = $("#" + id)
