@@ -5,11 +5,12 @@ var messages = document.querySelector(".chat-area");
 var chat = document.getElementById("chats");
 var userName = "default";
 var stream;
+
 $(".chat-header-button").on("click", function () {
-  console.log("meet join event");
   startVideoChat();
   $(".app-videos").removeClass("d-none");
   $(".chat-sec").addClass("chat-sec-in");
+  $("#chat-btn").addClass("act-red");
   $(this).addClass("d-none");
 });
 
@@ -20,7 +21,7 @@ $("#mic").on("click", function () {
   } else $thisbutton.find("span").text("mic");
 
   $thisbutton.toggleClass("act-red");
-  toggleTrack(userStream, "audio");
+  toggleTrack(stream, "audio");
 });
 
 $("#videocam").on("click", function () {
@@ -30,24 +31,25 @@ $("#videocam").on("click", function () {
   } else $thisbutton.find("span").text("videocam");
 
   $thisbutton.toggleClass("act-red");
-  toggleTrack(userStream, "video");
+  toggleTrack(stream, "video");
+});
+
+$("#chat-btn").on("click", function () {
+  $(this).toggleClass("act-red");
+  $(".chat-sec").toggleClass("d-none");
 });
 
 endCall.onclick = () => {
   $(".chat-header-button").removeClass("d-none");
   socket.emit("leave meet", socket.id);
   $(".chat-sec").removeClass("chat-sec-in");
+  $(".chat-sec").removeClass("d-none");
   myVideo.srcObject.getTracks().forEach((track) => track.stop());
   myVideo.srcObject = null;
   $("#consultingRoom").empty();
   $(".app-videos").addClass("d-none");
 };
 
-// $(".chat-input").keyup(function (e) {
-//   if (e.which == 13) {
-//     emitMessage();
-//   }
-// });
 $(".send-button").click(emitMessage);
 
 function emitMessage() {
@@ -106,7 +108,6 @@ function startVideoChat() {
     div.className = "video-participant";
     div.appendChild(myVideo);
     divConsultRoom.appendChild(div);
-    console.log("navigator");
     //Various signaling and adding remote peers
     socket.emit("join room", roomNumber + "-video", userName);
   });
@@ -114,7 +115,6 @@ function startVideoChat() {
 
 socket.on("all users", (users, names) => {
   userToName = names;
-  console.log(users);
   users.forEach((userID) => {
     const peer = createPeer(userID, socket.id, stream);
     peersObj.push({
