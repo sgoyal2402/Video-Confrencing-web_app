@@ -1,9 +1,18 @@
 var divConsultRoom = document.getElementById("consultingRoom");
 var myVideo = document.createElement("video");
 var endCall = document.getElementById("end-call");
-var chatBtn = document.querySelector(".chat");
+var messages = document.querySelector(".chat-area");
 var chat = document.getElementById("chats");
-var userStream;
+var userName = "default";
+var stream;
+
+$(".chat-header-button").on("click", function () {
+  startVideoChat();
+  $(".app-videos").removeClass("d-none");
+  $(".chat-sec").addClass("chat-sec-in");
+  $("#chat-btn").addClass("act-red");
+  $(this).addClass("d-none");
+});
 
 $("#mic").on("click", function () {
   var $thisbutton = $(this);
@@ -12,7 +21,7 @@ $("#mic").on("click", function () {
   } else $thisbutton.find("span").text("mic");
 
   $thisbutton.toggleClass("act-red");
-  toggleTrack(userStream, "audio");
+  toggleTrack(stream, "audio");
 });
 
 $("#videocam").on("click", function () {
@@ -22,71 +31,113 @@ $("#videocam").on("click", function () {
   } else $thisbutton.find("span").text("videocam");
 
   $thisbutton.toggleClass("act-red");
-  toggleTrack(userStream, "video");
+  toggleTrack(stream, "video");
 });
 
-chatBtn.onclick = () => {
-  chat.classList.toggle("d-none");
-};
+$("#chat-btn").on("click", function () {
+  $(this).toggleClass("act-red");
+  $(".chat-sec").toggleClass("d-none");
+});
 
 endCall.onclick = () => {
-  window.location.href = "/end/call";
+  $(".chat-header-button").removeClass("d-none");
+  socket.emit("leave meet", socket.id);
+  $(".chat-sec").removeClass("chat-sec-in");
+  $(".chat-sec").removeClass("d-none");
+  myVideo.srcObject.getTracks().forEach((track) => track.stop());
+  myVideo.srcObject = null;
+  $("#consultingRoom").empty();
+  $(".app-videos").addClass("d-none");
 };
 
-var message = document.getElementById("chat");
-var messages = document.getElementById("messages");
+$(".send-button").click(emitMessage);
 
-message.onkeydown = (e) => {
-  if (e.keyCode == 13) {
-    socket.emit("message", message.value, socket.id);
+function emitMessage() {
+  var $input = $(".chat-input");
+  var msg = $input.val();
+  socket.emit("message", msg, socket.id);
 
-    addMsg(message.value, socket.id);
-    message.value = null;
-  }
-};
+  addMsg(msg, socket.id);
+  $input.val(null);
+}
 
 var peers = [];
 var peersObj = [];
 var streamConstraints = { audio: true, video: true };
 var socket = io();
+var userToName = {};
 
-navigator.mediaDevices.getUserMedia(streamConstraints).then((stream) => {
-  //Adding own stream-video
-  userStream = stream;
-  myVideo.srcObject = stream;
-  myVideo.muted = true;
-  myVideo.autoplay = true;
-  var div = document.createElement("div");
-  div.className = "video-participant";
-  div.appendChild(myVideo);
-  divConsultRoom.appendChild(div);
+//Normal chat group
+socket.emit("join team", roomNumber, userName);
 
-  //Various signaling and adding remote peers
-  socket.emit("join room", roomNumber);
-  socket.on("all users", (users) => {
-    users.forEach((userID) => {
-      const peer = createPeer(userID, socket.id, stream);
-      peersObj.push({
-        peerID: userID,
-        peer,
-      });
-      peers.push(peer);
-    });
+//Recieve messages
+socket.on("messaged", (msg, id) => {
+  addMsg(msg, id);
+});
+
+function addMsg(msg, id) {
+  var m = createCard(msg, id);
+  messages.appendChild(m);
+}
+
+function createCard(msg, id) {
+  const card = `<div class = "message-content">
+     <p class = "name"> ${id} </p>
+     <p class = "message">${msg}</p>
+      </div> `;
+
+  var c = document.createElement("div");
+  c.innerHTML = card;
+  c.classList.add("message-wrapper");
+  if (id === socket.id) c.classList.add("reverse");
+  return c;
+}
+
+//Realted to Video Meet
+function startVideoChat() {
+  peers = [];
+  peersObj = [];
+  navigator.mediaDevices.getUserMedia(streamConstraints).then((s) => {
+    //Adding own stream-video
+    stream = s;
+    myVideo.srcObject = stream;
+    myVideo.muted = true;
+    myVideo.autoplay = true;
+    myVideo.id = socket.id;
+    var div = document.createElement("div");
+    div.className = "video-participant";
+    div.appendChild(myVideo);
+    divConsultRoom.appendChild(div);
+    //Various signaling and adding remote peers
+    socket.emit("join room", roomNumber + "-video", userName);
   });
+}
 
-  socket.on("user joined", (payload) => {
-    const peer = addPeer(payload.signal, payload.callerID, stream);
+socket.on("all users", (users, names) => {
+  userToName = names;
+  users.forEach((userID) => {
+    const peer = createPeer(userID, socket.id, stream);
     peersObj.push({
-      peerID: payload.callerID,
+      peerID: userID,
       peer,
     });
     peers.push(peer);
   });
+});
 
-  socket.on("receiving returned signal", (payload) => {
-    const item = peersObj.find((p) => p.peerID === payload.id);
-    item.peer.signal(payload.signal);
+socket.on("user joined", (payload) => {
+  userToName[payload.callerID] = payload.userName;
+  const peer = addPeer(payload.signal, payload.callerID, stream);
+  peersObj.push({
+    peerID: payload.callerID,
+    peer,
   });
+  peers.push(peer);
+});
+
+socket.on("receiving returned signal", (payload) => {
+  const item = peersObj.find((p) => p.peerID === payload.id);
+  item.peer.signal(payload.signal);
 });
 
 socket.on("user left", (id) => {
@@ -97,11 +148,6 @@ socket.on("user left", (id) => {
   let _peers = peersObj;
   peersObj = _peers.filter((p) => p.peerID !== id);
   peers = peers.filter((p) => p !== _peer.peer);
-});
-
-//Recieve messages
-socket.on("messaged", (msg, id) => {
-  addMsg(msg, id);
 });
 
 //Some Useful functions
@@ -117,6 +163,7 @@ function createPeer(userToSignal, callerID, stream) {
       userToSignal,
       callerID,
       signal,
+      userName,
     });
   });
 
@@ -158,26 +205,6 @@ function addVideo(callerID, stream) {
 
   div.appendChild(video);
   divConsultRoom.appendChild(div);
-}
-
-function addMsg(msg, id) {
-  var m = createCard(msg, id);
-
-  messages.appendChild(m);
-}
-
-function createCard(msg, id) {
-  const card = `<div class = "card-body">
-    <small class="card-subtitle mb-2 text-muted">User ${id.slice(0, 8)}</small>
-     <p class = "card-text">${msg}</p>
-      </div> `;
-
-  var c = document.createElement("div");
-  c.innerHTML = card;
-  c.classList.add("card");
-  c.classList.add("mb-1");
-
-  return c;
 }
 
 function toggleTrack(stream, type) {

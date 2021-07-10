@@ -20,9 +20,22 @@ app.get("/end/call", (req, res) => {
 
 const users = {};
 const socketToRoom = {};
+const socketToName = {};
 
 io.on("connection", (socket) => {
-  socket.on("join room", (roomID) => {
+  socket.on("join team", (roomID, name) => {
+    socket.join(roomID);
+    socket.on("message", (msg, id) => {
+      socket.to(roomID).emit("messaged", msg, id);
+      // var roomID = socketToRoom[socket.id];
+      // const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
+      // usersInThisRoom.forEach((user) => {
+      //   socket.to(user).emit("messaged", msg, id);
+      // });
+    });
+  });
+
+  socket.on("join room", (roomID, name) => {
     if (users[roomID]) {
       const length = users[roomID].length;
       if (length === 4) {
@@ -34,15 +47,18 @@ io.on("connection", (socket) => {
       users[roomID] = [socket.id];
     }
     socketToRoom[socket.id] = roomID;
+    socketToName[socket.id] = name;
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
-
-    socket.emit("all users", usersInThisRoom);
+    const names = {};
+    usersInThisRoom.forEach((user) => (names[user] = socketToName[user]));
+    socket.emit("all users", usersInThisRoom, names);
   });
 
   socket.on("sending signal", (payload) => {
     io.to(payload.userToSignal).emit("user joined", {
       signal: payload.signal,
       callerID: payload.callerID,
+      userName: payload.userName,
     });
   });
 
@@ -53,14 +69,18 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("message", (msg, id) => {
-    var roomID = socketToRoom[socket.id];
-    const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
-    usersInThisRoom.forEach((user) => {
-      socket.to(user).emit("messaged", msg, id);
-    });
+  socket.on("leave meet", (id) => {
+    const roomID = socketToRoom[id];
+    let room = users[roomID];
+    if (room) {
+      room = room.filter((id) => id !== socket.id);
+      users[roomID] = room;
+      //Tell other users to remove the peer which left
+      room.forEach((user) => {
+        socket.to(user).emit("user left", socket.id);
+      });
+    }
   });
-
   socket.on("disconnect", () => {
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];
