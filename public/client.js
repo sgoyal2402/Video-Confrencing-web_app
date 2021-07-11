@@ -3,7 +3,6 @@ var myVideo = document.createElement("video");
 var endCall = document.getElementById("end-call");
 var messages = document.querySelector(".chat-area");
 var chat = document.getElementById("chats");
-var userName = "default";
 var stream;
 
 $(".chat-header-button").on("click", function () {
@@ -55,10 +54,12 @@ $(".send-button").click(emitMessage);
 function emitMessage() {
   var $input = $(".chat-input");
   var msg = $input.val();
-  socket.emit("message", msg, socket.id);
+  if (msg !== "" || msg !== null || msg !== undefined) {
+    socket.emit("message", msg);
 
-  addMsg(msg, socket.id);
-  $input.val(null);
+    addMsg(msg, userName, true);
+    $input.val(null);
+  }
 }
 
 var peers = [];
@@ -66,30 +67,29 @@ var peersObj = [];
 var streamConstraints = { audio: true, video: true };
 var socket = io();
 var userToName = {};
-
 //Normal chat group
 socket.emit("join team", roomNumber, userName);
 
 //Recieve messages
-socket.on("messaged", (msg, id) => {
-  addMsg(msg, id);
+socket.on("messaged", (msg, name) => {
+  addMsg(msg, name, false);
 });
 
-function addMsg(msg, id) {
-  var m = createCard(msg, id);
+function addMsg(msg, name, reverse) {
+  var m = createCard(msg, name, reverse);
   messages.appendChild(m);
 }
 
-function createCard(msg, id) {
+function createCard(msg, name, reverse) {
   const card = `<div class = "message-content">
-     <p class = "name"> ${id} </p>
+     <p class = "name"> ${name} </p>
      <p class = "message">${msg}</p>
       </div> `;
 
   var c = document.createElement("div");
   c.innerHTML = card;
   c.classList.add("message-wrapper");
-  if (id === socket.id) c.classList.add("reverse");
+  if (reverse) c.classList.add("reverse");
   return c;
 }
 
@@ -107,6 +107,10 @@ function startVideoChat() {
     var div = document.createElement("div");
     div.className = "video-participant";
     div.appendChild(myVideo);
+    var nametag = document.createElement("p");
+    nametag.innerHTML = `${userName}(You)`;
+    nametag.className = "name-tag";
+    div.appendChild(nametag);
     divConsultRoom.appendChild(div);
     //Various signaling and adding remote peers
     socket.emit("join room", roomNumber + "-video", userName);
@@ -204,6 +208,12 @@ function addVideo(callerID, stream) {
   div.className = "video-participant";
 
   div.appendChild(video);
+
+  var nametag = document.createElement("p");
+  nametag.innerHTML = userToName[callerID];
+  nametag.className = "name-tag";
+
+  div.appendChild(nametag);
   divConsultRoom.appendChild(div);
 }
 

@@ -1,21 +1,120 @@
 const express = require("express");
 const app = express();
-const http = require("http").Server(app);
-var io = require("socket.io")(http);
+
+const mongoose = require("mongoose");
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
+const LocalStrategy = require("passport-local").Strategy;
+const findOrCreate = require("mongoose-findorcreate");
+
+const url =
+  "mongodb+srv://admin-surya:a1234567@cluster0.admca.mongodb.net/amsDB?retryWrites=true&w=majority";
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+};
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
+app.use(
+  session({
+    secret: "This is our little secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(express.urlencoded({ extended: true }));
+
+const http = require("http").Server(app);
+var io = require("socket.io")(http);
+
+mongoose.connect(url, options);
+
+const userSchema = new mongoose.Schema({
+  username: String,
+  displayname: String,
+  password: String,
+});
+
+userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
+
+const User = mongoose.model("User", userSchema);
+
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.get("/", (req, res) => {
-  res.render("home");
+  var auth = req.isAuthenticated();
+  res.render("home", { user: req.user, auth: auth });
 });
 
 app.get("/:roomId", (req, res) => {
-  res.render("room", { roomId: req.params.roomId });
+  if (req.isAuthenticated()) {
+    res.render("room", {
+      roomId: req.params.roomId,
+      name: req.user.displayname,
+      email: req.user.username,
+    });
+  }
 });
 
 app.get("/end/call", (req, res) => {
   res.render("leave");
+});
+
+app.get("/register", (req, res) => {
+  res.redirect("/");
+});
+
+app.get("/login", (req, res) => {
+  res.redirect("/");
+});
+
+app.post("/register", (req, res) => {
+  User.register(
+    new User({
+      username: req.body.username,
+      displayname: req.body.displayname,
+    }),
+    req.body.password,
+    (err, user) => {
+      if (err) {
+        console.log(err);
+        res.redirect("/");
+      } else {
+        passport.authenticate("local")(req, res, () => {
+          res.redirect("/");
+        });
+      }
+    }
+  );
+});
+
+app.post("/login", (req, res) => {
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password,
+  });
+  req.login(user, (err) => {
+    if (err) {
+      console.log(err);
+      res.redirect("/");
+    } else {
+      passport.authenticate("local")(req, res, () => {
+        res.redirect("/");
+      });
+    }
+  });
 });
 
 const users = {};
@@ -25,13 +124,9 @@ const socketToName = {};
 io.on("connection", (socket) => {
   socket.on("join team", (roomID, name) => {
     socket.join(roomID);
-    socket.on("message", (msg, id) => {
-      socket.to(roomID).emit("messaged", msg, id);
-      // var roomID = socketToRoom[socket.id];
-      // const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
-      // usersInThisRoom.forEach((user) => {
-      //   socket.to(user).emit("messaged", msg, id);
-      // });
+    socket.username = name;
+    socket.on("message", (msg) => {
+      socket.to(roomID).emit("messaged", msg, socket.username);
     });
   });
 

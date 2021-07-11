@@ -1,68 +1,203 @@
-
-<%- include ('header') -%> 
-
-  </head>
-  <body>
-
-    <h2 class="ml-3 mt-1">Web Meet</h2>
-
-
-    <div class="container mt-5">
-      <h1 class="text-center"></h1>
-
-      
-        <div class="row">
-          
-          <div class="col-md-7 mt-4">
-
-              <h4 >Welcome to the WebRTC Meet</h4>
-              <p>
-                Video Confrence and chat with all your friend no signin
-                required!!
-              </p>
-
-
-              <form class="form-inline mt-5">
-                
-                <div class="input-group">
-                  <button class="btn btn-secondary mr-3" id="create">
-                    <i class="fas fa-video"></i>
-                    Create Room
-                  </button>
-        
-                  <div class="input-group-prepend">
-                    <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">
-                      <i class="fas fa-keyboard"></i>
-                    </button>
-                  </div>
-
-                  <input class="form-control me-3" type="text" id="roomId" placeholder="Enter the room code" />
-
-                  <button class="btn btn-link d-none" type="submit" id="join" disabled>Join</button>
-                </div>
-
-               
-              </form>
-            
-          </div>
-
-          <div class="col-md-5 mt-4">
-           <div class="video-participant">
-            <h4>Your Video</h4>
-
-                <video class="mt-3 shadow bg-white rounded" id="myVideo" width="360">
-                </video>          
-
-        </div>
-          </div>
-
-        </div>   
-        
-        
-        
+<%- include ('header') -%>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Web Meet</span>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <% if (!auth) { %>
+          <li class="nav-item">
+            <button
+              class="btn btn-link"
+              data-toggle="modal"
+              data-target="#staticBackdrop1"
+            >
+              Login
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              class="btn btn-link"
+              data-toggle="modal"
+              data-target="#staticBackdrop2"
+            >
+              Register
+            </button>
+          </li>
+          <% } else{ %>
+          <li class="nav-item"><%= user.displayname %></li>
+          <% } %>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <script src="home.js"></script>
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="staticBackdrop1"
+    data-backdrop="static"
+    data-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Login</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/login" method="POST">
+            <div class="form-group">
+              <label for="email1">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                name="username"
+                required
+              />
+              <small id="emailHelp" class="form-text text-muted"
+                >We'll never share your email with anyone else.</small
+              >
+              <div class="invalid-feedback">Please provide a valid email.</div>
+            </div>
+            <div class="form-group">
+              <label for="password1">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                name="password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <%- include ('footer') -%> 
-   
+  <div
+    class="modal fade"
+    id="staticBackdrop2"
+    data-backdrop="static"
+    data-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Register</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/register" method="POST">
+            <div class="form-group">
+              <label for="password2">Named</label>
+              <input
+                type="text"
+                class="form-control"
+                name="displayname"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="email2">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                name="username"
+                required
+              />
+              <small id="emailHelp" class="form-text text-muted"
+                >We'll never share your email with anyone else.</small
+              >
+              <div class="invalid-feedback">Please provide a valid email.</div>
+            </div>
+            <div class="form-group">
+              <label for="password2">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                name="password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Section -->
+
+  <div class="container mt-5">
+    <h1 class="text-center"></h1>
+
+    <div class="row">
+      <div class="col-md-7 mt-4">
+        <h4>Welcome to the WebRTC Meet</h4>
+        <p>
+          Video Confrence and chat with all your friends!!
+        </p>
+
+        <form class="form-inline mt-5">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <button class="btn" disabled type="button" id="button-addon1">
+                <i class="fas fa-keyboard"></i>
+              </button>
+            </div>
+
+            <input
+              class="form-control me-3"
+              type="text"
+              id="roomId"
+              placeholder="Enter the room code"
+              autocomplete="off"
+            />
+          </div>
+          <button class="btn btn-link d-none" type="submit" id="join" disabled>
+            Join
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="home.js"></script>
+
+  <%- include ('footer') -%>
+</body>
