@@ -38,7 +38,12 @@
             </button>
           </li>
           <% } else{ %>
-          <li class="nav-item"><%= user.displayname %></li>
+          <li class="nav-item">
+          <p class="nav-link">  <%= user.displayname %> </p>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/logout">Log Out</a>
+          </li>
           <% } %>
         </ul>
       </div>
@@ -169,9 +174,7 @@
     <div class="row">
       <div class="col-md-7 mt-4">
         <h4>Welcome to the WebRTC Meet</h4>
-        <p>
-          Video Confrence and chat with all your friends!!
-        </p>
+        <p>Video Confrence and chat with all your friends!!</p>
 
         <form class="form-inline mt-5">
           <div class="input-group">
