@@ -54,7 +54,7 @@ $(".send-button").click(emitMessage);
 function emitMessage() {
   var $input = $(".chat-input");
   var msg = $input.val();
-  if (msg !== "" || msg !== null || msg !== undefined) {
+  if (msg !== "" && msg !== null && msg !== undefined) {
     socket.emit("message", msg);
 
     addMsg(msg, userName, true);
@@ -83,7 +83,7 @@ socket.on("messaged", (msg, name) => {
 function addMsg(msg, name, reverse) {
   var m = createCard(msg, name, reverse);
   messages.appendChild(m);
-  $(".chat-area").scrollTop($(".chat-area").height());
+  messages.lastElementChild.scrollIntoView();
 }
 
 function createCard(msg, name, reverse) {
