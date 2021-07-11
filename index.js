@@ -43,10 +43,17 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
+const chatSchema = new mongoose.Schema({
+  room: String,
+  msg: String,
+  name: String,
+});
+
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
 const User = mongoose.model("User", userSchema);
+const Chat = mongoose.model("Chat", chatSchema);
 
 passport.use(new LocalStrategy(User.authenticate()));
 
@@ -65,6 +72,8 @@ app.get("/:roomId", (req, res) => {
       name: req.user.displayname,
       email: req.user.username,
     });
+  } else {
+    res.redirect("/");
   }
 });
 
@@ -126,7 +135,13 @@ io.on("connection", (socket) => {
   socket.on("join team", (roomID, name) => {
     socket.join(roomID);
     socket.username = name;
+    Chat.find({ room: roomID }, (err, docs) => {
+      socket.emit("all chats", docs);
+    });
+
     socket.on("message", (msg) => {
+      c = new Chat({ room: roomID, msg: msg, name: socket.username });
+      c.save();
       socket.to(roomID).emit("messaged", msg, socket.username);
     });
   });

@@ -9,7 +9,7 @@ $(".chat-header-button").on("click", function () {
   startVideoChat();
   $(".app-videos").removeClass("d-none");
   $(".chat-sec").addClass("chat-sec-in");
-  $("#chat-btn").addClass("act-red");
+  $(".chat-sec").addClass("d-none");
   $(this).addClass("d-none");
 });
 
@@ -70,6 +70,11 @@ var userToName = {};
 //Normal chat group
 socket.emit("join team", roomNumber, userName);
 
+socket.on("all chats", (chats) => {
+  chats.forEach((chat) => {
+    addMsg(chat.msg, chat.name, chat.name === userName);
+  });
+});
 //Recieve messages
 socket.on("messaged", (msg, name) => {
   addMsg(msg, name, false);
@@ -78,6 +83,7 @@ socket.on("messaged", (msg, name) => {
 function addMsg(msg, name, reverse) {
   var m = createCard(msg, name, reverse);
   messages.appendChild(m);
+  $(".chat-area").scrollTop($(".chat-area").height());
 }
 
 function createCard(msg, name, reverse) {
@@ -130,6 +136,7 @@ socket.on("all users", (users, names) => {
 });
 
 socket.on("user joined", (payload) => {
+  addToast(payload.userName);
   userToName[payload.callerID] = payload.userName;
   const peer = addPeer(payload.signal, payload.callerID, stream);
   peersObj.push({
@@ -241,4 +248,15 @@ function toggleTrack(stream, type) {
       );
     });
   }
+}
+
+function addToast(name) {
+  var div = document.createElement("div");
+  div.className = "snackbar d-flex align-items-center";
+  // $("#toasts").empty();
+  div.innerHTML = `${name} Joined the meet`;
+  document.getElementById("toasts").appendChild(div);
+  setTimeout(() => {
+    $("#toasts").empty();
+  }, 2000);
 }

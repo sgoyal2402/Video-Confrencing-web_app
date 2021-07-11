@@ -2,6 +2,21 @@
   box-sizing: border-box;
 }
 
+::-webkit-scrollbar {
+  opacity: 0;
+  width: 5px;
+}
+::-webkit-scrollbar:hover {
+  opacity: 1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #859ddf;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
 textarea {
   resize: none;
 }
@@ -253,21 +268,18 @@ button:focus {
   width: 90%;
 }
 
-.card {
-  width: 80%;
-  height: auto;
-  margin-left: 10px;
+.snackbar {
+  background-color: #ea4335;
+  padding: 6px 16px;
+  color: #000;
+  font-weight: 600;
+  width: 344px;
+  height: 48px;
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
   border-radius: 5px;
-  border-color: green;
-}
-
-small {
-  margin-bottom: 0;
-}
-
-.card-body {
-  margin: 0;
-  padding: 5px 14px;
 }
 
 /* action buttons */
