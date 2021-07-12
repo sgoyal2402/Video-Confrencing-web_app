@@ -64,7 +64,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form action="/login" method="POST">
+          <form action="/login" method="POST" class="needs-validation" novalidate>
             <div class="form-group">
               <label for="email1">Email address</label>
               <input
@@ -86,6 +86,7 @@
                 name="password"
                 required
               />
+              <div class="invalid-feedback">Password can't be empty!</div>
             </div>
             <button type="submit" class="btn btn-primary">Login</button>
           </form>
@@ -117,15 +118,16 @@
           </button>
         </div>
         <div class="modal-body">
-          <form action="/register" method="POST">
+          <form action="/register" method="POST" class="needs-validation" novalidate>
             <div class="form-group">
-              <label for="password2">Named</label>
+              <label for="password2">Name</label>
               <input
                 type="text"
                 class="form-control"
                 name="displayname"
                 required
               />
+              <div class="invalid-feedback">Please provide a valid name.</div>
             </div>
             <div class="form-group">
               <label for="email2">Email address</label>
@@ -148,6 +150,7 @@
                 name="password"
                 required
               />
+              <div class="invalid-feedback">Password can't be empty!</div>
             </div>
             <button type="submit" class="btn btn-primary">Register</button>
           </form>

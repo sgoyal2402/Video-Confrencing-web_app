@@ -2,15 +2,12 @@ var create = document.getElementById("create");
 var join = document.getElementById("join");
 var input = document.getElementById("roomId");
 var form = document.querySelector(".form-inline");
+var roomId;
 
 //Stop reloading page on submit
 form.onsubmit = (event) => {
   event.preventDefault();
 };
-
-var roomId;
-
-console.log(auth);
 
 join.onclick = () => {
   roomId = document.getElementById("roomId").value;

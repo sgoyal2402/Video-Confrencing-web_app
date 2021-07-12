@@ -4,6 +4,11 @@ var endCall = document.getElementById("end-call");
 var messages = document.querySelector(".chat-area");
 var chat = document.getElementById("chats");
 var stream;
+var peers = [];
+var peersObj = [];
+var streamConstraints = { audio: true, video: true };
+var socket = io();
+var userToName = {};
 
 $(".chat-header-button").on("click", function () {
   startVideoChat();
@@ -49,6 +54,7 @@ endCall.onclick = () => {
   $(".app-videos").addClass("d-none");
 };
 
+//Sending Message
 $(".send-button").click(emitMessage);
 
 function emitMessage() {
@@ -62,11 +68,6 @@ function emitMessage() {
   }
 }
 
-var peers = [];
-var peersObj = [];
-var streamConstraints = { audio: true, video: true };
-var socket = io();
-var userToName = {};
 //Normal chat group
 socket.emit("join team", roomNumber, userName);
 
@@ -118,11 +119,13 @@ function startVideoChat() {
     nametag.className = "name-tag";
     div.appendChild(nametag);
     divConsultRoom.appendChild(div);
-    //Various signaling and adding remote peers
+
+    //Emit Join Room to get other user's info
     socket.emit("join room", roomNumber + "-video", userName);
   });
 }
 
+//Connect to other users
 socket.on("all users", (users, names) => {
   userToName = names;
   users.forEach((userID) => {
@@ -258,5 +261,5 @@ function addToast(name) {
   document.getElementById("toasts").appendChild(div);
   setTimeout(() => {
     $("#toasts").empty();
-  }, 10000);
+  }, 2000);
 }

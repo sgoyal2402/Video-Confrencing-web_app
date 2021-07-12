@@ -187,7 +187,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];
-    if (room) {
+    if (room !== undefined && room !== null && room) {
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
       //Tell other users to remove the peer which left

@@ -66,6 +66,7 @@ button:focus {
   height: 100%;
   overflow: hidden;
   justify-content: center;
+  align-items: center;
 }
 
 .video-participant {
@@ -82,14 +83,14 @@ button:focus {
 }
 .video-participant:first-child:nth-last-child(2),
 .video-participant:first-child:nth-last-child(2) ~ .video-participant {
-  width: 48%;
+  width: calc(48% - 20px);
   height: calc(100% - 20px);
 }
 
 .video-participant:first-child:nth-last-child(3),
 .video-participant:first-child:nth-last-child(3) ~ .video-participant {
-  width: 32%;
-  height: calc(100% - 20px);
+  width: calc(32% - 20px);
+  height: 70%;
 }
 
 .video-participant:first-child:nth-last-child(4),
