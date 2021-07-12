@@ -2,20 +2,10 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand navbar-light bg-light">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">Web Meet</span>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <% if (!auth) { %>
@@ -39,7 +29,7 @@
           </li>
           <% } else{ %>
           <li class="nav-item">
-          <p class="nav-link">  <%= user.displayname %> </p>
+            <p class="nav-link"><%= user.displayname %></p>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/user/logout">Log Out</a>
@@ -165,6 +155,13 @@
       </div>
     </div>
   </div>
+  <!-- Login Alter -->
+  <% if (!auth) {%>
+  <div class="home-alert d-flex align-items-center">
+    <span>Please Login or Register to Join</span>
+    <span class="material-icons" style="cursor: pointer;" id="close-alert"> close </span>
+  </div>
+  <% } %>
 
   <!-- Main Section -->
 
@@ -199,7 +196,9 @@
       </div>
     </div>
   </div>
-
+  <script>
+    var auth = "<%=auth%>";
+  </script>
   <script src="home.js"></script>
 
   <%- include ('footer') -%>

@@ -32,7 +32,12 @@
       <div class="chat-container">
         <div class="chat-header">
           <h5>Team <%= roomId %> Chat</h5>
-          <button class="chat-header-button">Meet</button>
+          <div>
+            <a href="/" class="btn btn-link" style="font-size: 1rem"
+              ><i class="fas fa-home"></i>Home</a
+            >
+            <button class="chat-header-button">Meet</button>
+          </div>
         </div>
         <div class="chat-area"></div>
         <div class="chat-typing-area-wrapper">
@@ -65,7 +70,7 @@
     </div>
   </div>
   <!-- Toasts -->
-  <div id = "toasts"></div>
+  <div id="toasts"></div>
 
   <script>
     var roomNumber = "<%= roomId %>";

@@ -113,8 +113,8 @@ function startVideoChat() {
     var div = document.createElement("div");
     div.className = "video-participant";
     div.appendChild(myVideo);
-    var nametag = document.createElement("p");
-    nametag.innerHTML = `${userName}(You)`;
+    var nametag = document.createElement("span");
+    nametag.innerHTML = `${userName} (You)`;
     nametag.className = "name-tag";
     div.appendChild(nametag);
     divConsultRoom.appendChild(div);
@@ -216,7 +216,7 @@ function addVideo(callerID, stream) {
 
   div.appendChild(video);
 
-  var nametag = document.createElement("p");
+  var nametag = document.createElement("span");
   nametag.innerHTML = userToName[callerID];
   nametag.className = "name-tag";
 
@@ -258,5 +258,5 @@ function addToast(name) {
   document.getElementById("toasts").appendChild(div);
   setTimeout(() => {
     $("#toasts").empty();
-  }, 2000);
+  }, 10000);
 }

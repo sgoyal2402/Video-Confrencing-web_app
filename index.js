@@ -77,14 +77,6 @@ app.get("/:roomId", (req, res) => {
   }
 });
 
-app.get("/register", (req, res) => {
-  res.redirect("/");
-});
-
-app.get("/login", (req, res) => {
-  res.redirect("/");
-});
-
 app.get("/user/logout", (req, res) => {
   req.logout();
   res.redirect("/");
