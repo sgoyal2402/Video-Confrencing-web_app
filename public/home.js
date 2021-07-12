@@ -17,10 +17,12 @@ join.onclick = () => {
   window.location.href = `/${roomId}`;
 };
 
-document.getElementById("close-alert").onclick = () => {
-  document.querySelector(".home-alert").classList.add("d-none");
-  document.querySelector(".home-alert").classList.remove("d-flex");
-};
+if (!auth) {
+  document.getElementById("close-alert").onclick = () => {
+    document.querySelector(".home-alert").classList.add("d-none");
+    document.querySelector(".home-alert").classList.remove("d-flex");
+  };
+}
 
 input.onfocus = () => {
   join.classList.remove("d-none");
