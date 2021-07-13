@@ -56,6 +56,9 @@ endCall.onclick = () => {
 
 //Sending Message
 $(".send-button").click(emitMessage);
+$(".chat-input").keypress(function (event) {
+  if (event.which === 13) emitMessage();
+});
 
 function emitMessage() {
   var $input = $(".chat-input");

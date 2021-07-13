@@ -32,7 +32,7 @@ input.onblur = () => {
 
 input.onkeyup = () => {
   join.disabled = false;
-  join.style.color = "green";
+  join.style.color = "white";
   if (document.getElementById("roomId").value === "") join.disabled = true;
 };
 

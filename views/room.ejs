@@ -31,7 +31,7 @@
     <div class="chat-sec" id="chats">
       <div class="chat-container">
         <div class="chat-header">
-          <h5>Team <%= roomId %> Chat</h5>
+          <h5>Team <%= roomId %></h5>
           <div>
             <a href="/" class="btn btn-link" style="font-size: 1rem"
               ><i class="fas fa-home"></i>Home</a
@@ -42,14 +42,12 @@
         <div class="chat-area"></div>
         <div class="chat-typing-area-wrapper">
           <div class="chat-typing-area">
-            <textarea
+            <input
+              type="text"
               name="chat-msg"
               placeholder="Type your message..."
               class="chat-input"
-              rows="1"
-              cols="50"
-              wrap="hard"
-            ></textarea>
+            />
             <button class="send-button">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
