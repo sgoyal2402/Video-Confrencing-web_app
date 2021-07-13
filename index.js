@@ -183,11 +183,13 @@ io.on("connection", (socket) => {
         socket.to(user).emit("user left", socket.id);
       });
     }
+    delete socketToRoom[id];
   });
-  socket.on("disconnect", () => {
+  socket.on("disconnecting", () => {
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];
     if (room !== undefined && room !== null && room) {
+      console.log("emitted dis");
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
       //Tell other users to remove the peer which left

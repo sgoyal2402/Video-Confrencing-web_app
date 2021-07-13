@@ -13,6 +13,8 @@ var userToName = {};
 $(".chat-header-button").on("click", function () {
   startVideoChat();
   $(".app-videos").removeClass("d-none");
+  $("#mic").removeClass("act-red");
+  $("#videocam").removeClass("act-red");
   $(".chat-sec").addClass("chat-sec-in");
   $(".chat-sec").addClass("d-none");
   $(this).addClass("d-none");
@@ -165,6 +167,7 @@ socket.on("user left", (id) => {
   let _peers = peersObj;
   peersObj = _peers.filter((p) => p.peerID !== id);
   peers = peers.filter((p) => p !== _peer.peer);
+  _peer.peer.destroy();
 });
 
 //Some Useful functions
