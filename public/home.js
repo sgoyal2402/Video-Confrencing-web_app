@@ -14,7 +14,7 @@ join.onclick = () => {
   window.location.href = `/${roomId}`;
 };
 
-if (!auth) {
+if (auth === "false") {
   document.getElementById("close-alert").onclick = () => {
     document.querySelector(".home-alert").classList.add("d-none");
     document.querySelector(".home-alert").classList.remove("d-flex");
@@ -47,7 +47,6 @@ window.addEventListener(
           if (form.checkValidity() === false) {
             event.preventDefault();
             event.stopPropagation();
-            console.log("form sttoped");
           }
           form.classList.add("was-validated");
         },
